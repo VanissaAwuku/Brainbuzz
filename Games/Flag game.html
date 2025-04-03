@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flag Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-image: url('path/to/your-background-image.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            color: white;
+            position: relative;
+        }
+        
+        #game-container {
+            margin: 50px auto;
+            max-width: 600px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 15px;
+        }
+        .flag {
+            max-width: 300px;
+            margin: 20px 0;
+            border: 5px solid white;
+            border-radius: 10px;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .option {
+            padding: 10px 15px;
+            width: 200px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .option:hover {
+            background-color: #2980b9;
+        }
+        #result {
+            font-size: 20px;
+            margin: 20px;
+        }
+        #restart {
+            padding: 10px 15px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        #restart:hover {
+            background-color: #27ae60;
+        }
+        #home-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 15px;
+            background-color: floralwhite;
+            color: blue;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        #home-button:hover {
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <a href="C:\Users\hp\Desktop\pic\Maths game\homepage.html" id="home-button">← Home</a>
+    <div id="game-container">
+        <h1>Flag Game</h1>
+        <div id="score">Score: 0</div>
+        <img id="flag-image" class="flag" src="" alt="Country Flag">
+        <div class="options" id="options"></div>
+        <div id="result"></div>
+        <button id="restart" style="display:none;" onclick="startGame()">Restart Game</button>
+    </div>
+    <script>
+        const flags = [
+            { name: 'Ghana', url: 'https://flagcdn.com/w320/gh.png' },
+            { name: 'Japan', url: 'https://flagcdn.com/w320/jp.png' },
+            { name: 'United States', url: 'https://flagcdn.com/w320/us.png' },
+            { name: 'Brazil', url: 'https://flagcdn.com/w320/br.png' },
+            { name: 'India', url: 'https://flagcdn.com/w320/in.png' },
+            { name: 'Canada', url: 'https://flagcdn.com/w320/ca.png' },
+            { name: 'Australia', url: 'https://flagcdn.com/w320/au.png' },
+            { name: 'Georgia', url: 'https://flagcdn.com/w320/ge.png' },
+            { name: 'Montenegro', url: 'https://flagcdn.com/w320/me.png' },
+            { name: 'Lesotho', url: 'https://flagcdn.com/w320/ls.png' },
+            { name: 'Ireland', url:'https://flagpedia.net/data/flags/h80/ie.webp'},
+            { name: 'Italy', url: 'https://flagpedia.net/data/flags/h80/it.webp'},
+            { name: 'Israel', url:'https://flagpedia.net/data/flags/h80/il.webp'},
+            { name: 'Kenya', url:'https://flagpedia.net/data/flags/h80/ke.webp'},
+            { name: 'South Korea', url:'https://flagpedia.net/data/flags/h80/kr.webp'},
+        ];
+
+        let score = 0;
+        const targetScore = 5;
+        let usedFlags = [];
+        let availableFlags = [...flags];
+
+        function getRandomFlag() {
+            if (availableFlags.length === 0) {
+                // Reset available flags if all have been used
+                availableFlags = [...flags];
+            }
+
+            const randomIndex = Math.floor(Math.random() * availableFlags.length);
+            const flag = availableFlags[randomIndex];
+            availableFlags.splice(randomIndex, 1); // Remove the flag from available flags
+            
+            return flag;
+        }
+
+        function getRandomOptions(correctFlag) {
+            const options = [correctFlag];
+            
+            // Get 2 unique wrong options
+            while (options.length < 3) {
+                const randomFlag = flags[Math.floor(Math.random() * flags.length)];
+                if (!options.includes(randomFlag) && randomFlag !== correctFlag) {
+                    options.push(randomFlag);
+                }
+            }
+            
+            // Shuffle the options
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+            
+            return options;
+        }
+
+        function updateScore(isCorrect) {
+            if (isCorrect) {
+                score++;
+                document.getElementById('result').innerHTML = '🎉 Correct!';
+            } else {
+                document.getElementById('result').innerHTML = '😢 Try Again!';
+            }
+            document.getElementById('score').innerHTML = `Score: ${score}`;
+
+            if (score >= targetScore) {
+                document.getElementById('result').innerHTML = '🏅 You won the game!';
+                document.getElementById('restart').style.display = 'block';
+                return true;
+            }
+            return false;
+        }
+
+        function renderFlag(flag) {
+            document.getElementById('flag-image').src = flag.url;
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+
+            const options = getRandomOptions(flag);
+            
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'option';
+                button.innerHTML = option.name;
+                button.onclick = () => {
+                    const isCorrect = option === flag;
+                    if (!updateScore(isCorrect)) {
+                        renderFlag(getRandomFlag());
+                    }
+                };
+                optionsDiv.appendChild(button);
+            });
+        }
+
+        function startGame() {
+            score = 0;
+            availableFlags = [...flags];
+            usedFlags = [];
+            document.getElementById('restart').style.display = 'none';
+            document.getElementById('score').innerHTML = `Score: ${score}`;
+            renderFlag(getRandomFlag());
+        }
+
+        startGame();
+    </script>
+</body>
+</html>

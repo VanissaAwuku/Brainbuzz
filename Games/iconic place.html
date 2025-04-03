@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Historical Places Quiz</title>
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+            text-align: center;
+            padding: 20px;
+        }
+        .home-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: var(--primary-color);
+    color: blue;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.home-btn:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+}
+
+/* Make container relative to contain the absolute positioned button */
+.container {
+    position: relative;
+    /* Your existing container styles */
+}
+        h1 {
+            color: #333;
+        }
+        img {
+            width: 300px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .place {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px;
+            color: #007bff;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+        }
+        .option {
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #fff;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .option:hover {
+            background-color: #e1f5fe;
+        }
+        #feedback {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+        #feedback.correct {
+            color: #28a745;
+        }
+        #feedback.wrong {
+            color: #dc3545;
+        }
+        #score {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container"></div>
+    <a href="C:\Users\hp\Desktop\pic\Maths game\homepage.html" class="home-btn" onclick="returnToHome()">← Home</a>
+    <h1>Historical Places Quiz</h1>
+    <div id="quiz">
+        <div id="place">
+            <img id="placeImage" src="" alt="Historical Place">
+            <div class="place" id="placeName"></div>
+        </div>
+        <div class="options" id="options"></div>
+        <div id="feedback"></div>
+        <div id="score">Score: 0</div>
+    </div>
+    <script>
+        const historicalPlaces = [
+            { place: "Eiffel Tower", image: "https://images.pexels.com/photos/20170726/pexels-photo-20170726/free-photo-of-paris.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1", options: ["Paris, France", "Berlin, Germany", "London, England"], answer: "Paris, France" },
+            { place: "Great Wall of China", image: "https://images.pexels.com/photos/28910661/pexels-photo-28910661/free-photo-of-great-wall-of-china-against-mountainous-landscape.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1", options: ["Beijing, China", "Seoul, South Korea", "Tokyo, Japan"], answer: "Beijing, China" },
+            { place: "Machu Picchu", image: "https://images.pexels.com/photos/2929906/pexels-photo-2929906.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1", options: ["Bogotá, Colombia","Cusco, Peru", "Quito, Ecuador"], answer: "Cusco, Peru" },
+            { place: "Pyramids of Giza", image: "https://images.pexels.com/photos/71241/pexels-photo-71241.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1", options: ["Cairo, Egypt", "Athens, Greece", "Rome, Italy"], answer: "Cairo, Egypt" },
+            { place: "Statue of Liberty", image: "https://images.pexels.com/photos/887849/pexels-photo-887849.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1", options: ["New York City, USA", "Washington, D.C., USA", "Los Angeles, USA"], answer: "New York City, USA" },
+            { place: "Taj Mahal", image: "https://images.pexels.com/photos/1603650/pexels-photo-1603650.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1", options: ["Agra, India", "Jaipur, India", "Delhi, India"], answer: "Agra, India" },
+            { place: "Colosseum", image: "https://images.pexels.com/photos/1797161/pexels-photo-1797161.jpeg?auto=compress&cs=tinysrgb&w=600", options: ["Rome, Italy", "Venice, Italy", "Naples, Italy"], answer: "Rome, Italy" },
+            { place: "Christ the Redeemer", image: "https://images.pexels.com/photos/9229056/pexels-photo-9229056.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1", options: ["Buenos Aires, Argentina","Rio de Janeiro, Brazil", "Lima, Peru"], answer: "Rio de Janeiro, Brazil" },
+            { place: "Sydney Opera House", image: "https://images.pexels.com/photos/1878293/pexels-photo-1878293.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1", options: ["Sydney, Australia", "Melbourne, Australia", "Brisbane, Australia"], answer: "Sydney, Australia" },
+            { place: "Tower of Pisa", image: "https://images.pexels.com/photos/4026103/pexels-photo-4026103.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1", options: ["Itay, Milan", "Bangkok, Thailand", "Italy, Pisa"], answer: "Italy, Pisa" }
+        ];
+
+        let score = 0;
+        let currentIndex = 0;
+
+        const placeImageElement = document.getElementById("placeImage");
+        const placeNameElement = document.getElementById("placeName");
+        const optionsElement = document.getElementById("options");
+        const feedbackElement = document.getElementById("feedback");
+        const scoreElement = document.getElementById("score");
+
+        function displayPlace() {
+            const currentPlace = historicalPlaces[currentIndex];
+            placeImageElement.src = currentPlace.image; // Set the image URL
+            placeNameElement.textContent = currentPlace.place;
+            optionsElement.innerHTML = "";
+
+            currentPlace.options.forEach(option => {
+                const button = document.createElement("button");
+                button.textContent = option;
+                button.classList.add("option");
+                button.addEventListener("click", () => checkAnswer(option));
+                optionsElement.appendChild(button);
+            });
+        }
+
+        function checkAnswer(option) {
+            const currentPlace = historicalPlaces[currentIndex];
+            if (option === currentPlace.answer) {
+                feedbackElement.textContent = "Correct! 👍";
+                feedbackElement.className = "correct";
+                score++;
+                scoreElement.textContent = `Score: ${score}`;
+            } else {
+                feedbackElement.textContent = "Wrong! 😢";
+                feedbackElement.className = "wrong";
+            }
+
+            currentIndex++;
+            if (score >= 5) {
+                setTimeout(() => {
+                    alert("Congrats, you won! 🏅");
+                    restartGame();
+                }, 500);
+            } else if (currentIndex < historicalPlaces.length) {
+                setTimeout(displayPlace, 500);
+            } else {
+                setTimeout(restartGame, 500);
+            }
+        }
+
+        function restartGame() {
+            score = 0;
+            currentIndex = 0;
+            feedbackElement.textContent = "";
+            scoreElement.textContent = `Score: ${score}`;
+            displayPlace();
+        }
+        function returnToHome() {
+    document.getElementById('game-section').style.display = 'none';
+    document.getElementById('categories').style.display = 'grid';
+    document.getElementById('instructions').style.display = 'none';
+    document.getElementById('how-to-play').style.display = 'inline-block';
+    return false;
+}
+        // Start the game
+        displayPlace();
+    </script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Profession</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background: linear-gradient(to right, #74ebd5, #acb6e5);
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .home-button {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+        .home-button:hover {
+            background: #cc0000;
+            transform: scale(1.05);
+        }
+        h1 {
+            margin-top: 50px;
+            font-size: 2.5em;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .image-container {
+            margin: 20px auto;
+            padding: 10px;
+        }
+        .image-container img {
+            width: 250px;
+            height: 250px;
+            border-radius: 15px;
+            border: 4px solid #fff;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            transition: opacity 0.5s ease-in-out;
+        }
+        .options-container {
+            margin-top: 20px;
+        }
+        .option {
+            display: block;
+            margin: 10px auto;
+            padding: 12px;
+            width: 220px;
+            background: #007BFF;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .option:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+        .feedback {
+            font-size: 1.8em;
+            margin: 20px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .hidden {
+            display: none;
+        }
+        #score {
+            font-size: 1.5em;
+            margin-top: 10px;
+            font-weight: bold;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <button class="home-button" onclick="goHome()">🏠 Home</button>
+
+    <h1>Guess the Profession</h1>
+    <div class="image-container">
+        <img id="professionImage" src="" alt="Profession">
+    </div>
+    <div class="options-container" id="optionsContainer"></div>
+    <div class="feedback" id="feedback"></div>
+    <h2 id="score">Score: 0</h2>
+
+    <script>
+        const professions = [
+            { image: 'https://images.pexels.com/photos/4047186/pexels-photo-4047186.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', correct: 'Doctor', options: ['Teacher', 'Doctor', 'Engineer'] },
+            { image: 'https://images.pexels.com/photos/5212339/pexels-photo-5212339.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', correct: 'Teacher', options: ['Police Officer', 'Teacher', 'Pilot'] },
+            { image: 'https://images.pexels.com/photos/256381/pexels-photo-256381.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', correct: 'Engineer', options: ['Doctor', 'Chef', 'Engineer'] },
+            { image: 'https://images.pexels.com/photos/2696064/pexels-photo-2696064.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', correct: 'Chef', options: ['Pilot', 'Chef', 'Nurse'] },
+            { image: 'https://images.pexels.com/photos/7715187/pexels-photo-7715187.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', correct: 'Police Officer', options: ['Doctor', 'Police Officer', 'Artist'] },
+        ];
+
+        let currentProfession = 0;
+        let score = 0;
+
+        function loadProfession() {
+            const profession = professions[currentProfession];
+            const image = document.getElementById('professionImage');
+            image.style.opacity = 0;
+
+            setTimeout(() => {
+                image.src = profession.image;
+                image.style.opacity = 1;
+            }, 300);
+
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            profession.options.forEach(option => {
+                const button = document.createElement('button');
+                button.innerText = option;
+                button.classList.add('option');
+                button.onclick = () => checkAnswer(option);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function checkAnswer(selectedOption) {
+            const profession = professions[currentProfession];
+            const feedback = document.getElementById('feedback');
+
+            feedback.style.opacity = 0;
+            setTimeout(() => {
+                if (selectedOption === profession.correct) {
+                    feedback.innerHTML = '🎉 Correct!';
+                    feedback.style.color = 'green';
+                    score++;
+                } else {
+                    feedback.innerHTML = '❌ Wrong!';
+                    feedback.style.color = 'red';
+                }
+                feedback.style.opacity = 1;
+                document.getElementById('score').innerText = `Score: ${score}`;
+
+                currentProfession++;
+                if (currentProfession >= professions.length) {
+                    setTimeout(endGame, 1500);
+                } else {
+                    setTimeout(() => {
+                        feedback.style.opacity = 0;
+                        loadProfession();
+                    }, 1000);
+                }
+            }, 300);
+        }
+
+        function endGame() {
+            const feedback = document.getElementById('feedback');
+            feedback.innerHTML = `🎉 Well done! 🏅 Final Score: ${score}`;
+            document.getElementById('optionsContainer').classList.add('hidden');
+
+            setTimeout(restartGame, 3000);
+        }
+
+        function restartGame() {
+            currentProfession = 0;
+            score = 0;
+            document.getElementById('score').innerText = `Score: ${score}`;
+            document.getElementById('feedback').innerHTML = '';
+            document.getElementById('optionsContainer').classList.remove('hidden');
+            loadProfession();
+        }
+
+        function goHome() {
+            window.location.href = "homepage.html"; // Change this URL to your homepage
+        }
+
+        loadProfession();
+    </script>
+</body>
+</html>

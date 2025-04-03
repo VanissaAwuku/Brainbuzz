@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spelling Game</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --accent-color: #4fc3f7;
+            --correct-color: #4caf50;
+            --wrong-color: #f44336;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            color: var(--secondary-color);
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        
+        #game-section, #instructions {
+            display: none;
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+        }
+        
+        #result {
+            font-size: 1.3rem;
+            margin: 15px 0;
+            min-height: 30px;
+        }
+        
+        .correct {
+            color: var(--correct-color);
+        }
+        
+        .wrong {
+            color: var(--wrong-color);
+        }
+        
+        #categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .category-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .category-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        #image-container {
+            margin: 20px auto;
+            width: 250px;
+            height: 250px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border: 3px solid var(--light-color);
+        }
+        
+        #image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        #guess {
+            padding: 12px 15px;
+            width: 70%;
+            max-width: 400px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            margin-right: 10px;
+            transition: border 0.3s;
+        }
+        
+        #guess:focus {
+            border-color: var(--accent-color);
+            outline: none;
+        }
+        
+        #submit-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        #submit-btn:hover {
+            background-color: var(--secondary-color);
+            transform: scale(1.05);
+        }
+        
+        .score-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .score-box {
+            background-color: var(--light-color);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            margin: 0 10px;
+        }
+        
+        #score {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        #progress {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+        
+        #back-btn {
+            background-color: transparent;
+            color: var(--secondary-color);
+            border: 2px solid var(--secondary-color);
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+        
+        #back-btn:hover {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .emoji-feedback {
+            font-size: 2rem;
+            margin: 10px 0;
+        }
+        
+        /* New home button styles */
+        .home-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .home-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 600px) {
+            #categories {
+                grid-template-columns: 1fr;
+            }
+            
+            #guess {
+                width: 60%;
+            }
+            
+            .home-btn {
+                top: 10px;
+                left: 10px;
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="C:\Users\hp\Desktop\pic\Maths game\homepage.html" class="home-btn" onclick="returnToHome()">← Home</a>
+        
+        <h1>Spelling Challenge</h1>
+        <p class="subtitle">Test your spelling skills with fun images!</p>
+        
+        <button id="how-to-play" onclick="showInstructions()">How to Play</button>
+        
+        <div id="instructions">
+            <h2>How to Play</h2>
+            <p>1. Choose a category from the options</p>
+            <p>2. Look at the image and spell what you see</p>
+            <p>3. Type your answer in the box and click Submit</p>
+            <p>4. Get 5 correct answers to win!</p>
+            <p>5. You can change categories anytime</p>
+            <button onclick="hideInstructions()">Got it!</button>
+        </div>
+        
+        <div id="categories">
+            <button class="category-btn" onclick="startGame('animals')"> Animals</button>
+            <button class="category-btn" onclick="startGame('countries')"> Countries</button>
+            <button class="category-btn" onclick="startGame('food')"> Food</button>
+            <button class="category-btn" onclick="startGame('plants')"> Plants</button>
+            <button class="category-btn" onclick="startGame('objects')"> Objects</button>
+            <button class="category-btn" onclick="startGame('transport')"> Transport</button>
+        </div>
+
+        <div id="game-section">
+            <h2 id="category-title"></h2>
+            
+            <div class="score-container">
+                <div class="score-box">Score: <span id="score">0</span></div>
+                <div class="score-box">Progress: <span id="progress">0/10</span></div>
+            </div>
+            
+            <div id="image-container">
+                <img id="image" alt="Guess the word">
+            </div>
+            
+            <div class="emoji-feedback" id="emoji-feedback"></div>
+            <div id="result"></div>
+            
+            <input type="text" id="guess" placeholder="Type your answer here" autocomplete="off">
+            <button id="submit-btn" onclick="checkAnswer()">Submit</button>
+            
+            <button id="back-btn" onclick="restartGame()">Back to Categories</button>
+        </div>
+    </div>
+
+    <script>
+        const data = {
+            animals: [
+                { word: 'elephant', image: 'https://images.pexels.com/photos/133394/pexels-photo-133394.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'giraffe', image: 'https://images.pexels.com/photos/1319515/pexels-photo-1319515.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'kangaroo', image: 'https://images.pexels.com/photos/2573494/pexels-photo-2573494.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'octopus', image: 'https://images.pexels.com/photos/3046629/pexels-photo-3046629.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'rhinoceros', image: 'https://images.pexels.com/photos/16040/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'crocodile', image: 'https://images.pexels.com/photos/26841270/pexels-photo-26841270/free-photo-of-crocodile-in-mud.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'frog', image: 'https://images.pexels.com/photos/70083/frog-macro-amphibian-green-70083.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'eagle', image: 'https://images.pexels.com/photos/53581/bald-eagles-bald-eagle-bird-of-prey-adler-53581.jpeg' }
+            ],
+            countries: [
+                { word: 'ghana', image: 'https://flagcdn.com/w320/gh.png' },
+                { word: 'japan', image: 'https://flagcdn.com/w320/jp.png' },
+                { word: 'canada', image: 'https://flagcdn.com/w320/ca.png' },
+                { word: 'brazil', image: 'https://flagcdn.com/w320/br.png' },
+                { word: 'india', image: 'https://flagcdn.com/w320/in.png' },
+                { word: 'italy', image: 'https://flagpedia.net/data/flags/h80/it.webp' },
+                { word: 'kenya', image: 'https://flagpedia.net/data/flags/h80/ke.webp' },
+                { word: 'south korea', image: 'https://flagpedia.net/data/flags/h80/kr.webp' }
+            ],
+            food: [
+                { word: 'spaghetti', image: 'https://images.pexels.com/photos/17499766/pexels-photo-17499766/free-photo-of-spaghetti-with-sauce-on-the-plate.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'burger', image: 'https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'pancakes', image: 'https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'avocado', image: 'https://images.pexels.com/photos/557659/pexels-photo-557659.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'pizza', image: 'https://images.pexels.com/photos/825661/pexels-photo-825661.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'cupcake', image: 'https://images.pexels.com/photos/1055271/pexels-photo-1055271.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'doughnut', image: 'https://images.pexels.com/photos/913816/pexels-photo-913816.jpeg?auto=compress&cs=tinysrgb&w=600' },
+                { word: 'fried chicken', image: 'https://images.pexels.com/photos/1059943/pexels-photo-1059943.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }
+            ],
+            plants: [
+                { word: 'sunflower', image: 'https://images.pexels.com/photos/1366630/pexels-photo-1366630.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'cactus', image: 'https://images.pexels.com/photos/2265090/pexels-photo-2265090.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'bamboo', image: 'https://images.pexels.com/photos/60877/pexels-photo-60877.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'rose', image: 'https://images.pexels.com/photos/196664/pexels-photo-196664.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'banana', image: 'https://images.pexels.com/photos/365810/pexels-photo-365810.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'mushroom', image: 'https://images.pexels.com/photos/53494/mushroom-fungi-fungus-many-53494.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'orange', image: 'https://images.pexels.com/photos/161559/background-bitter-breakfast-bright-161559.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'mango', image: 'https://images.pexels.com/photos/2294471/pexels-photo-2294471.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }
+            ],
+            objects: [
+                { word: 'umbrella', image: 'https://images.pexels.com/photos/1715161/pexels-photo-1715161.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'backpack', image: 'https://images.pexels.com/photos/2905238/pexels-photo-2905238.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'keyboard', image: 'https://images.pexels.com/photos/1772123/pexels-photo-1772123.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'telescope', image: 'https://images.pexels.com/photos/901974/pexels-photo-901974.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'spoon', image: 'https://images.pexels.com/photos/350417/pexels-photo-350417.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'calculator', image: 'https://images.pexels.com/photos/4386328/pexels-photo-4386328.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'microphone', image: 'https://images.pexels.com/photos/2097428/pexels-photo-2097428.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'television', image: 'https://images.pexels.com/photos/6976094/pexels-photo-6976094.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }
+            ],
+            transport: [
+                { word: 'helicopter', image: 'https://images.pexels.com/photos/90287/pexels-photo-90287.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'hot air ballon', image: 'https://images.pexels.com/photos/28112879/pexels-photo-28112879/free-photo-of-hot-air-baloon.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'skateboard', image: 'https://images.pexels.com/photos/3773656/pexels-photo-3773656.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'train', image: 'https://images.pexels.com/photos/72594/japan-train-railroad-railway-72594.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'plane', image: 'https://images.pexels.com/photos/1089306/pexels-photo-1089306.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'bulldozer', image: 'https://images.pexels.com/photos/25559749/pexels-photo-25559749/free-photo-of-excavator-on-field.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+                { word: 'rocket', image: 'https://images.pexels.com/photos/41005/rocket-launch-rocket-take-off-soyuz-41005.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'},
+                { word: 'wheelchair', image: 'https://images.pexels.com/photos/927690/pexels-photo-927690.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }
+            ]
+        };
+
+        let currentCategory, currentIndex, score, correctAnswers, usedIndices;
+
+        function showInstructions() {
+            document.getElementById('instructions').style.display = 'block';
+            document.getElementById('categories').style.display = 'none';
+            document.getElementById('how-to-play').style.display = 'none';
+        }
+
+        function hideInstructions() {
+            document.getElementById('instructions').style.display = 'none';
+            document.getElementById('categories').style.display = 'grid';
+            document.getElementById('how-to-play').style.display = 'inline-block';
+        }
+
+        function startGame(category) {
+            currentCategory = category;
+            currentIndex = 0;
+            score = 0;
+            correctAnswers = 0;
+            usedIndices = [];
+
+            document.getElementById('categories').style.display = 'none';
+            document.getElementById('game-section').style.display = 'block';
+            document.getElementById('instructions').style.display = 'none';
+            document.getElementById('how-to-play').style.display = 'none';
+            
+            document.getElementById('category-title').textContent = `Category: ${category.charAt(0).toUpperCase() + category.slice(1)}`;
+            document.getElementById('score').textContent = score;
+            document.getElementById('progress').textContent = `${correctAnswers}/5`;
+            document.getElementById('result').textContent = '';
+            document.getElementById('emoji-feedback').textContent = '';
+
+            showRandomImage();
+        }
+
+        function showRandomImage() {
+            // Get a random index we haven't used yet
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * data[currentCategory].length);
+            } while (usedIndices.includes(randomIndex) && usedIndices.length < data[currentCategory].length);
+            
+            usedIndices.push(randomIndex);
+            currentIndex = randomIndex;
+            
+            const currentData = data[currentCategory][currentIndex];
+            document.getElementById('image').src = currentData.image;
+            document.getElementById('result').textContent = '';
+            document.getElementById('emoji-feedback').textContent = '';
+            document.getElementById('guess').value = '';
+            document.getElementById('guess').focus();
+        }
+
+        function checkAnswer() {
+            const userGuess = document.getElementById('guess').value.toLowerCase().trim();
+            const correctAnswer = data[currentCategory][currentIndex].word;
+            const resultElement = document.getElementById('result');
+            const emojiElement = document.getElementById('emoji-feedback');
+
+            if (userGuess === correctAnswer) {
+                resultElement.textContent = 'Correct! Well done!';
+                resultElement.className = 'correct';
+                emojiElement.textContent = '🎉👍';
+                score += 5;
+                correctAnswers++;
+                document.getElementById('score').textContent = score;
+                document.getElementById('progress').textContent = `${correctAnswers}/5`;
+
+                if (correctAnswers === 5) {
+                    setTimeout(() => {
+                        alert(`🎉 Congratulations! You won with ${score} points!`);
+                        restartGame();
+                    }, 800);
+                    return;
+                }
+            } else {
+                resultElement.textContent = `Oops! The correct spelling is "${correctAnswer}".`;
+                resultElement.className = 'wrong';
+                emojiElement.textContent = '😢👎';
+                score = Math.max(0, score - 2);
+                document.getElementById('score').textContent = score;
+            }
+
+            setTimeout(showRandomImage, 1500);
+        }
+
+        function restartGame() {
+            document.getElementById('game-section').style.display = 'none';
+            document.getElementById('categories').style.display = 'grid';
+            document.getElementById('how-to-play').style.display = 'inline-block';
+        }
+        
+        function returnToHome() {
+            document.getElementById('game-section').style.display = 'none';
+            document.getElementById('categories').style.display = 'grid';
+            document.getElementById('instructions').style.display = 'none';
+            document.getElementById('how-to-play').style.display = 'inline-block';
+            return false;
+        }
+
+        // Allow pressing Enter to submit
+        document.getElementById('guess').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+    </script>
+</body>
+</html>
